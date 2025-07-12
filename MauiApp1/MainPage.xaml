@@ -1,0 +1,32 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:local="clr-namespace:MauiApp1"
+             xmlns:model="clr-namespace:MauiApp1.Models"
+             x:Class="MauiApp1.MainPage"
+             x:DataType="local:MainPage">
+
+    <ScrollView>
+        <VerticalStackLayout
+            Padding="30,0"
+            Spacing="25">
+            <HorizontalStackLayout Spacing="5">
+                <Entry x:Name="TodoEntry" Placeholder="What do you need to do?"/>
+                <Button Clicked="Button_OnClicked" Text="Add Todo"/>
+            </HorizontalStackLayout>
+            <ListView ItemsSource="{Binding TodoItems}">
+                <ListView.ItemTemplate>
+                    <DataTemplate x:DataType="model:TodoItem">
+                        <ViewCell>
+                            <HorizontalStackLayout HorizontalOptions="Fill">
+                                <Label Text="{Binding Title}"/>
+                                <CheckBox IsChecked="{Binding IsCompleted}"/>
+                            </HorizontalStackLayout>
+                        </ViewCell>
+                    </DataTemplate>
+                </ListView.ItemTemplate>
+            </ListView>
+        </VerticalStackLayout>
+    </ScrollView>
+
+</ContentPage>
