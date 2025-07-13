@@ -1,17 +1,24 @@
-﻿using System.Collections.ObjectModel;
-using MauiApp1.Models;
+﻿
+
 using MauiApp1.ViewModels;
 
-namespace MauiApp1;
+namespace MauiApp1.Views;
 
 public partial class MainPage : ContentPage
 {
-    private readonly MainViewModel _mainViewModel = new();
+    private readonly MainViewModel _mainViewModel;
 
-    public MainPage()
+    public MainPage(MainViewModel vm)
     {
         InitializeComponent();
-        BindingContext = _mainViewModel;
-        
+        _mainViewModel = vm;
+        BindingContext = vm;
+
+    }
+
+    protected override async void OnAppearing()
+    {
+        base.OnAppearing();
+        await _mainViewModel.LoadTodoItemsAsync();
     }
 }

@@ -2,44 +2,57 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Windows.Input;
+using MauiApp1.Core;
 using MauiApp1.Models;
+using MauiApp1.Services;
 
 namespace MauiApp1.ViewModels;
 
 public class MainViewModel : INotifyPropertyChanged
 {
-    public MainViewModel()
+    private readonly ITodoService _todoService;
+    public MainViewModel(ITodoService todoService)
     {
-        AddTodoCommand = new Command(AddTodo);
+        AddTodoCommand = new AsyncCommand(AddTodoAsync);
+
+        _todoService = todoService;
     }
-    public ObservableCollection<TodoItem> TodoItems { get; set; } = new();
-    private string title;
+    public ObservableCollection<TodoItem> TodoItems { get; } = new();
+    private string _title = String.Empty;
 
     public string Title
     {
-        get => title;
+        get => _title;
         set
         {
-            if (title != value)
-            {
-                title = value;
-                OnPropertyChanged();
-            }
+            if (_title == value) return;
+            _title = value;
+            OnPropertyChanged();
         }
     }
     public event PropertyChangedEventHandler? PropertyChanged;
 
-    private void AddTodo()
+    public async Task AddTodoAsync()
     {
-        if (!string.IsNullOrWhiteSpace(Title))
+        if (string.IsNullOrWhiteSpace(Title)) return;
+
+        var newItem = await _todoService.AddTodoAsync(Title);
+        Title = string.Empty;
+        TodoItems.Add(newItem);
+    }
+
+
+    public async Task LoadTodoItemsAsync()
+    {
+        var todoItems = await _todoService.GetTodoListAsync();
+        TodoItems.Clear();
+        foreach (var item in todoItems)
         {
-            TodoItems.Add(new TodoItem {Title = Title, IsCompleted = false});
-            Title = string.Empty;
-            OnPropertyChanged();
+            TodoItems.Add(item);
         }
     }
     
-    private void OnPropertyChanged([CallerMemberName] string propertyName = null)
+    private void OnPropertyChanged([CallerMemberName] string? propertyName = null)
         => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
 
     public ICommand AddTodoCommand { get; }
